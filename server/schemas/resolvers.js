@@ -33,6 +33,27 @@ const resolvers = {
 
             return { token, user };
         },
+        saveBook: async (parent, { book }, { user }) => {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: user._id },
+                { $addToSet: { savedBooks: book } },
+                { new: true, runValidators: true }
+            );
+
+            return updatedUser;
+        },
+        deleteBook: async (parent, { bookId }, { user }) => {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: user._id },
+                { $pull: { savedBooks: { bookId } } },
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                throw new Error("Couldn't find user with this id!");
+            }
+            return updatedUser;
+        }
     }
 
 };
